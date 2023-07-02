@@ -1,11 +1,144 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>QR Service KIOSK</title>
+  <title>Form Survey Website</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* CSS to style the table */
+    .food-selection {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .food-selection th, .food-selection td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: center;
+    }
+    .food-selection td:first-child {
+      width: 30%;
+    }
+    .food-selection td:nth-child(2) {
+      width: 40%;
+    }
+    .food-selection td:last-child {
+      width: 30%;
+    }
+    .kiosk-image {
+      display: none;
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
 </head>
 <body>
-  <h1>QR KISOK Website </h1>
-  <p>This is a project created by Chat GPT and [Your Name].</p>
+  <h1>Welcome to the Form Survey Website</h1>
+
+  <table class="food-selection">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Food Details</th>
+        <th>Add to Bucket</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><img src="wonton soup.png" alt="Wonton Soup" class="small-image"></td>
+        <td>Wonton Soup</td>
+        <td><button class="add-to-bucket">Add to Bucket</button></td>
+      </tr>
+      <tr>
+        <td><img src="SOFTDRINK.PNG" alt="Soft Drink" class="small-image"></td>
+        <td>Soft Drink</td>
+        <td><button class="add-to-bucket">Add to Bucket</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="bucket">
+    <h2>Order List</h2>
+    <ul id="order-list"></ul>
+    <button id="ready-to-order" disabled>Ready to Order</button>
+    <button id="checkout" disabled>Checkout in KIOSK</button>
+    <div id="kiosk-view">
+      <img id="kiosk-image" class="kiosk-image" src="">
+    </div>
+  </div>
+
+  <script>
+    var addToBucketButtons = document.getElementsByClassName("add-to-bucket");
+    var orderList = document.getElementById("order-list");
+    var readyToOrderButton = document.getElementById("ready-to-order");
+    var checkoutButton = document.getElementById("checkout");
+    var kioskImage = document.getElementById("kiosk-image");
+    var kioskView = document.getElementById("kiosk-view");
+    var orderItems = [];
+    var currentIndex = 0;
+    var sliderInterval;
+
+    for (var i = 0; i < addToBucketButtons.length; i++) {
+      addToBucketButtons[i].addEventListener("click", function() {
+        var foodName = this.parentNode.parentNode.cells[1].textContent;
+        var listItem = document.createElement("li");
+        listItem.textContent = foodName;
+        orderList.appendChild(listItem);
+        orderItems.push(foodName);
+
+        readyToOrderButton.disabled = false;
+      });
+    }
+
+    readyToOrderButton.addEventListener("click", function() {
+      var orderItems = orderList.getElementsByTagName("li");
+      for (var i = 0; i < orderItems.length; i++) {
+        var foodName = orderItems[i].textContent;
+        var qrCodeImage = document.createElement("img");
+        qrCodeImage.className = "qr-code";
+        if (foodName === "Wonton Soup") {
+          qrCodeImage.src = "598200992.png";
+        } else if (foodName === "Soft Drink") {
+          qrCodeImage.src = "598201433.png";
+        }
+        kioskView.appendChild(qrCodeImage);
+      }
+      readyToOrderButton.disabled = true;
+      checkoutButton.disabled = false;
+
+      // Start the slider interval
+      startSlider();
+    });
+
+    checkoutButton.addEventListener("click", function() {
+      stopSlider();
+
+      var qrCodeImages = document.getElementsByClassName("qr-code");
+      if (qrCodeImages.length > 0) {
+        var currentImage = qrCodeImages[0];
+        kioskImage.src = currentImage.src;
+        currentImage.remove();
+        kioskImage.style.display = "block";
+        checkoutButton.disabled = true;
+      }
+      orderList.innerHTML = "";
+      orderItems = [];
+    });
+
+    function startSlider() {
+      sliderInterval = setInterval(function() {
+        var qrCodeImages = document.getElementsByClassName("qr-code");
+        if (qrCodeImages.length > 0) {
+          var currentImage = qrCodeImages[currentIndex];
+          kioskImage.src = currentImage.src;
+          currentImage.remove();
+          kioskImage.style.display = "block";
+          currentIndex = (currentIndex + 1) % qrCodeImages.length;
+        }
+      }, 2000);
+    }
+
+    function stopSlider() {
+      clearInterval(sliderInterval);
+    }
+  </script>
 </body>
 </html>
